@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://dn8ku1p8v0kc7"]
+
+[ext_resource type="Texture2D" uid="uid://ysb8xk5jqyn2" path="res://art/freezer.png" id="1_7rwt8"]
+
+[sub_resource type="GDScript" id="GDScript_xneur"]
+script/source = "extends RigidBody2D
+
+signal collected
+
+func _ready():
+	add_to_group(\"mob_freezers\")
+	$SelfDestructTimer.start()
+
+func _on_self_destruct_timer_timeout():
+	queue_free()
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q0b6x"]
+size = Vector2(97, 96)
+
+[node name="MobFreezer" type="RigidBody2D"]
+gravity_scale = 1.66533e-16
+freeze = true
+script = SubResource("GDScript_xneur")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("1_7rwt8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_q0b6x")
+
+[node name="SelfDestructTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="timeout" from="SelfDestructTimer" to="." method="_on_self_destruct_timer_timeout"]

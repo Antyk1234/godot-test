@@ -1,0 +1,104 @@
+[gd_scene load_steps=12 format=3 uid="uid://yaeq4r7vn1ij"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_cgjef"]
+[ext_resource type="PackedScene" uid="uid://blk4yn5vamk7l" path="res://player.tscn" id="1_uvr6x"]
+[ext_resource type="PackedScene" uid="uid://csmsi4p6c763b" path="res://mob.tscn" id="2_uiwss"]
+[ext_resource type="AudioStream" uid="uid://b8h14x3dwn7wx" path="res://art/gameover.wav" id="3_1hvv6"]
+[ext_resource type="PackedScene" uid="uid://yxie0im2lxmb" path="res://mob_destroyer.tscn" id="3_bdkcv"]
+[ext_resource type="PackedScene" uid="uid://dn8ku1p8v0kc7" path="res://mob_freezer.tscn" id="4_1d32j"]
+[ext_resource type="PackedScene" uid="uid://c7kldyynk4au7" path="res://hud.tscn" id="4_qmsir"]
+[ext_resource type="AudioStream" uid="uid://bjd7u0dbyxwrx" path="res://art/House In a Forest Loop.ogg" id="6_27wx3"]
+
+[sub_resource type="Curve2D" id="Curve2D_6wuci"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 480, 4, 0, 0, 0, 0, 479, 718, 0, 0, 0, 0, 1, 719, 0, 0, 0, 0, 1, 1)
+}
+point_count = 5
+
+[sub_resource type="Curve2D" id="Curve2D_qdr84"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 128, 128, 0, 0, 0, 0, 360, 128, 0, 0, 0, 0, 360, 608, 0, 0, 0, 0, 128, 608, 0, 0, 0, 0, 128, 128)
+}
+point_count = 5
+
+[sub_resource type="Curve2D" id="Curve2D_7eat1"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 136.043, 166.151, 0, 0, 0, 0, 352.039, 164.798, 0, 0, 0, 0, 354.594, 572.79, 0, 0, 0, 0, 138.599, 574.143, 0, 0, 0, 0, 136.043, 166.151)
+}
+point_count = 5
+
+[node name="Main" type="Node"]
+script = ExtResource("1_cgjef")
+mob_scene = ExtResource("2_uiwss")
+mob_destroyer_scene = ExtResource("3_bdkcv")
+mob_freezer_scene = ExtResource("4_1d32j")
+
+[node name="DeathSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_1hvv6")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.188235, 0, 0.129412, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_uvr6x")]
+
+[node name="MobTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(240, 450)
+
+[node name="MobPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_6wuci")
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+position = Vector2(1, 1)
+rotation = 0.00626297
+
+[node name="HUD" parent="." instance=ExtResource("4_qmsir")]
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_27wx3")
+
+[node name="MobDestroyerPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_qdr84")
+
+[node name="MobDestroyerSpawnLocation" type="PathFollow2D" parent="MobDestroyerPath"]
+position = Vector2(128, 128)
+
+[node name="MobDestroyerTimer" type="Timer" parent="."]
+wait_time = 7.0
+
+[node name="MobFreezerTimer" type="Timer" parent="."]
+wait_time = 3.0
+
+[node name="MobFreezerPath" type="Path2D" parent="."]
+position = Vector2(1, 1)
+rotation = 0.00626297
+curve = SubResource("Curve2D_7eat1")
+
+[node name="MobFreezerSpawnLocation" type="PathFollow2D" parent="MobFreezerPath"]
+position = Vector2(136.043, 166.151)
+rotation = -0.00626391
+
+[connection signal="collected_mob_destroyer" from="Player" to="." method="_on_player_collected_mob_destroyer"]
+[connection signal="collected_mob_freezer" from="Player" to="." method="_on_player_collected_mob_freezer"]
+[connection signal="hit" from="Player" to="." method="game_over"]
+[connection signal="hit" from="Player" to="." method="_on_player_hit"]
+[connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="start_game" from="HUD" to="." method="_on_hud_start_game"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="timeout" from="MobDestroyerTimer" to="." method="_on_mob_destroyer_timer_timeout"]
+[connection signal="timeout" from="MobFreezerTimer" to="." method="_on_mob_freezer_timer_timeout"]

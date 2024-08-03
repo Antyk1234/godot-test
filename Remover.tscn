@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://dkcdro8phmiir"]
+
+[ext_resource type="Texture2D" uid="uid://diegdgrg7uerd" path="res://art/destroyer.png" id="1_7s25p"]
+
+[sub_resource type="GDScript" id="GDScript_qdllj"]
+script/source = "extends Area2D
+
+signal collected
+
+
+func _on_body_entered(body):
+	hide() # Player disappears after being hit.
+	collected.emit()
+	print(\"Collected emited\")
+	# Must be deferred as we can't change physics properties on a physics callback.
+	$CollisionShape2D.set_deferred(\"disabled\", true)
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_imrb6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7s25p")
+}],
+"loop": true,
+"name": &"exist",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_orxah"]
+size = Vector2(96, 95)
+
+[node name="Area2D" type="Area2D"]
+script = SubResource("GDScript_qdllj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." groups=["removers"]]
+scale = Vector2(0.75, 0.75)
+sprite_frames = SubResource("SpriteFrames_imrb6")
+animation = &"exist"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(2.08165e-12, 2.08165e-12)
+shape = SubResource("RectangleShape2D_orxah")
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
